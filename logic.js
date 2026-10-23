@@ -318,6 +318,12 @@ function useSkill() {
     p.dash = { vx: c * 1060, vy: s * 1060, t: .16 }; p.inv = .35; beep(320, .16, 'sawtooth', .05, -200);
   } else if (ch.id === 'david') {
     p.dash = { vx: c * 1400, vy: s * 1400, t: .14, slash: true, hits: new Set() }; p.inv = .3; p.stabAnim = .18;
+    if (g.slowT <= 0) {   // same time-crawl + teal look as his ult, just short (no extra speed boost, no intro freeze)
+      g.slowT = g.slowMax = 1.0; g.slowF = .06; p.haste = 1;
+      p.lgx = p.x; p.lgy = p.y; p.ghostT = 0;
+      g.ghosts = g.ghosts.filter(gh => !gh.sand);
+      g.rings.push({ x: p.x, y: p.y, r: 10, max: 110, t: .35 });
+    }
     beep(900, .1, 'sawtooth', .05, -600); beep(260, .14, 'square', .04, -120);
   } else if (ch.id === 'viper') {
     g.bullets.push({ x: p.x + c * 14, y: p.y + s * 14, vx: c * 740, vy: s * 740, own: 'k', dmg: 999, bossDmg: 70, life: .8, r: 5, col: '#ffd7dc', pierce: true, hits: new Set() });
@@ -335,7 +341,7 @@ function useUlt() {
   const g = G, p = g.p;
   if (g.state !== 'play' || p.ult < 100) return;
   p.ult = 0;
-  if (g.pslowT > 0 && g.ch.id !== 'david') { g.pslowT = 0; g.pslowF = 1; addText(p.x, p.y - 46, 'ทำลายสนาม!', '#ff4fc3'); g.rings.push({ x: p.x, y: p.y, r: 10, max: 170, t: .45 }); }
+  if (g.pslowT > 0 && g.ch.id !== 'david') { g.pslowT = 0; g.pslowF = 1; addText(p.x, p.y - 46, 'ทำลายสนาม!', '#37e6d4'); g.rings.push({ x: p.x, y: p.y, r: 10, max: 170, t: .45 }); }
   if (g.ch.id === 'shade') p.invis = 6;
   else if (g.ch.id === 'viper') p.blade = 4;
   else if (g.ch.id === 'david') startSandevistan(5, .06);
@@ -388,11 +394,11 @@ function playerUpdate(dt, real) {
         if (e.dead || p.dash.hits.has(e) || Math.hypot(e.x - p.x, e.y - p.y) > e.r + p.r + 14) continue;
         p.dash.hits.add(e);
         hurtEnemy(e, e.boss ? 70 : 999, { melee: true });
-        g.shake = 4; spark(e.x, e.y, 10, '#ff3347', 220);
+        g.shake = 4; spark(e.x, e.y, 10, '#37e6d4', 220);
         g.fx.push({ x: e.x, y: e.y, vx: 0, vy: 0, t: .25, max: .25, col: '#ffffff', r: 12 });
       }
     }
-    g.fx.push({ x: p.x, y: p.y, vx: 0, vy: 0, t: .3, max: .3, col: '#ff3347', r: 10 });
+    g.fx.push({ x: p.x, y: p.y, vx: 0, vy: 0, t: .3, max: .3, col: '#37e6d4', r: 10 });
     p.dash.t -= dt;
     if (p.dash.t <= 0) { p.mvx = clamp(p.dash.vx * .14, -sp, sp); p.mvy = clamp(p.dash.vy * .14, -sp, sp); p.dash = null; }   // glide out of the dash instead of stopping dead
   } else {
@@ -702,7 +708,7 @@ function bossAI(e, dt, seen, a2p, d) {
         g.pslowF = .35; e.bossT = 20; e.rushT = .9;   // cooldown 20s (field lasts 3.5s of it)
         e.fireT = .1;
         g.shake = 6; g.rings.push({ x: p.x, y: p.y, r: 10, max: 160, t: .5 });
-        addText(p.x, p.y - 40, 'เวลาของคุณช้าลง', '#ff4fc3'); beep(70, .7, 'sawtooth', .07, 380);
+        addText(p.x, p.y - 40, 'เวลาของคุณช้าลง', '#37e6d4'); beep(70, .7, 'sawtooth', .07, 380);
       }
     } else if (e.bossT <= 0 && seen && g.pslowT <= 0 && g.stopT <= 0) {
       e.sandWarn = .7; addText(e.x, e.y - 34, 'SANDEVISTAN!', e.color); beep(1200, .3, 'sine', .05, -700);
@@ -988,7 +994,7 @@ function update(dt) {
   if (g.pslowT > 0) { g.pslowT -= rdt; if (g.pslowT <= 0) { g.pslowT = 0; g.pslowF = 1; beep(520, .3, 'sine', .04, -300); } }
   // both Sandevistans running at once: player and boss share the same (real-time) speed, everything else stays slowed
   const clash = g.slowT > 0 && g.pslowT > 0;
-  if (clash && !g.clash) { addText(W / 2, H / 2 - 40, 'SANDEVISTAN CLASH', '#ff4fc3'); g.shake = 7; beep(60, .6, 'sawtooth', .07, 300); }
+  if (clash && !g.clash) { addText(W / 2, H / 2 - 40, 'SANDEVISTAN CLASH', '#37e6d4'); g.shake = 7; beep(60, .6, 'sawtooth', .07, 300); }
   g.clash = clash;
   const pf = g.pslowT > 0 && !clash ? g.pslowF : 1;   // WRAITH's Sandevistan: the player's own time runs slower (unless David matches it)
   g.pf = pf;

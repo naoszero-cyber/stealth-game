@@ -67,7 +67,7 @@ function drawEnemy(e) {
   if (e.rage > 0) { ctx.fillStyle = 'rgba(255,170,60,.22)'; ctx.beginPath(); ctx.arc(0, 0, e.r + 8, 0, TAU); ctx.fill(); }
   if (e.sandWarn > 0) {   // charging up Sandevistan
     const k = 1 - e.sandWarn / .7;
-    ctx.strokeStyle = `rgba(255,79,195,${.35 + .5 * Math.sin(k * 30) ** 2})`; ctx.lineWidth = 3;
+    ctx.strokeStyle = `rgba(63,242,230,${.35 + .5 * Math.sin(k * 30) ** 2})`; ctx.lineWidth = 3;
     ctx.beginPath(); ctx.arc(0, 0, e.r + 6 + k * 26, 0, TAU); ctx.stroke();
   }
   if (e.boss) { ctx.fillStyle = col + '30'; ctx.beginPath(); ctx.arc(0, 0, e.r + 7, 0, TAU); ctx.fill(); }
@@ -140,7 +140,7 @@ function drawPlayer() {
     ctx.strokeStyle = 'rgba(255,215,220,.25)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(p.x, p.y, 62, 0, TAU); ctx.stroke();
   }
   if (G.pslowT > 0 && G.pf < 1) {
-    ctx.strokeStyle = 'rgba(255,79,195,.8)'; ctx.lineWidth = 2; ctx.setLineDash([5, 5]);
+    ctx.strokeStyle = 'rgba(63,242,230,.8)'; ctx.lineWidth = 2; ctx.setLineDash([5, 5]);
     ctx.beginPath(); ctx.arc(p.x, p.y, p.r + 10, G.time * -2, G.time * -2 + TAU * .85); ctx.stroke(); ctx.setLineDash([]);
   }
   if (G.slowT > 0) {
@@ -279,7 +279,7 @@ function drawHUD() {
   if (g.pslowT > 0) {
     const bw = 260, bx = W / 2 - bw / 2, by = (boss ? 86 : 60) + (g.slowT > 0 ? 22 : 0);
     ctx.fillStyle = 'rgba(10,12,16,.78)'; rr(bx, by, bw, 18, 4); ctx.fill();
-    ctx.fillStyle = '#ff4fc3'; rr(bx + 3, by + 3, (bw - 6) * (g.pslowT / g.pslowMax), 12, 3); ctx.fill();
+    ctx.fillStyle = '#37e6d4'; rr(bx + 3, by + 3, (bw - 6) * (g.pslowT / g.pslowMax), 12, 3); ctx.fill();
     ctx.fillStyle = '#0b0d10'; ctx.font = `800 10px ${MONO}`; ctx.textAlign = 'center';
     ctx.fillText(g.clash ? 'ปะทะ Sandevistan · ความเร็วเท่ากัน  ' + g.pslowT.toFixed(1) + 's' : 'เวลาถูกหน่วง  ' + g.pslowT.toFixed(1) + 's' + (g.p.ult >= 100 ? '  ·  กด R ทำลายสนาม' : ''), W / 2, by + 13);
   }
@@ -328,11 +328,11 @@ function draw() {
   drawPlayer(); drawGrenades(); drawBullets(); drawWalls(); drawFx();
   if (g.debug) drawDebug();
   if (g.stopT > 0) { ctx.fillStyle = 'rgba(110,160,255,.13)'; ctx.fillRect(0, 0, W, H); }
-  if (g.pslowT > 0) {   // WRAITH's field: heavy magenta wash, edges pulled in
+  if (g.pslowT > 0) {   // WRAITH's field: same teal-green wash as the player's Sandevistan, edges pulled in
     const k = Math.min(1, g.pslowT / .3, (g.pslowMax - g.pslowT) / .15 + .3);
-    ctx.fillStyle = `rgba(150,30,120,${.14 * k})`; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = `rgba(30,235,185,${.1 * k})`; ctx.fillRect(0, 0, W, H);
     const vg = ctx.createRadialGradient(W / 2, H / 2, H * .3, W / 2, H / 2, H * .8);
-    vg.addColorStop(0, 'rgba(255,79,195,0)'); vg.addColorStop(1, `rgba(255,79,195,${.42 * k})`);
+    vg.addColorStop(0, 'rgba(0,20,16,0)'); vg.addColorStop(1, `rgba(0,18,14,${.3 * k})`);
     ctx.fillStyle = vg; ctx.fillRect(0, 0, W, H);
   }
   if (g.slowT > 0) {   // Sandevistan: teal-green wash, crushed dark edges, scanlines, speed streaks right after the flash
