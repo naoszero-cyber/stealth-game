@@ -297,7 +297,7 @@ function drawHUD() {
   if (g.prompt && g.state === 'play') {
     const d = g.prompt, gn = GUNS[d.gun];
     ctx.textAlign = 'center'; ctx.font = `700 13px ${FONT}`;
-    const s = `[E] หยิบ${gn.name} (${d.ammo})`, tw = ctx.measureText(s).width + 16;
+    const s = `${window.touchUI ? 'แตะ E' : '[E]'} หยิบ${gn.name} (${d.ammo})`, tw = ctx.measureText(s).width + 16;
     ctx.fillStyle = 'rgba(10,12,16,.85)'; rr(d.x - tw / 2, d.y - 44, tw, 22, 4); ctx.fill();
     ctx.fillStyle = gn.color; ctx.fillText(s, d.x, d.y - 28);
   }

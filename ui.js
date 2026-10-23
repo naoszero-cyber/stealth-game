@@ -63,7 +63,7 @@ function showResult() {
 function togglePause() {
   if (!G || G.state !== 'play') return;
   G.paused = !G.paused;
-  if (G.paused) showOverlay('พักเกม', 'กด P หรือ Esc เพื่อเล่นต่อ', [{ t: 'เล่นต่อ', f: togglePause }, { t: 'กลับเมนู', f: toMenu, cls: 'ghost' }]);
+  if (G.paused) showOverlay('พักเกม', (window.touchUI ? 'กดปุ่มเล่นต่อเพื่อกลับเข้าเกม' : 'กด P หรือ Esc เพื่อเล่นต่อ'), [{ t: 'เล่นต่อ', f: togglePause }, { t: 'กลับเมนู', f: toMenu, cls: 'ghost' }]);
   else overlay.hidden = true;
 }
 

@@ -377,6 +377,7 @@ function playerUpdate(dt, real) {
   let ix = (keys.KeyD || keys.ArrowRight ? 1 : 0) - (keys.KeyA || keys.ArrowLeft ? 1 : 0);
   let iy = (keys.KeyS || keys.ArrowDown ? 1 : 0) - (keys.KeyW || keys.ArrowUp ? 1 : 0);
   if (ix || iy) { const l = Math.hypot(ix, iy); ix /= l; iy /= l; }
+  else if (window.touchMove && (touchMove.x || touchMove.y)) { ix = touchMove.x; iy = touchMove.y; }   // touch stick: analog, length 0..1
   p.moving = !!(ix || iy);
   const sp = p.spd * (p.sneak ? .55 : 1) * p.haste;
   const ox = p.x, oy = p.y;

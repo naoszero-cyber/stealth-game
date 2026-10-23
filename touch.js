@@ -2,11 +2,14 @@
 // Mobile touch controls. Feeds the existing input state (keys / mouse) and calls the existing action functions.
 // Shown only on touch-capable devices, only while a mission is on screen.
 (function () {
+  const PHONE = !!(window.matchMedia && matchMedia('(pointer: coarse)').matches);   // phone/tablet: touch is the primary input
+  window.touchUI = PHONE;
+  window.touchMove = { x: 0, y: 0 };
   const TOUCH = (window.matchMedia && matchMedia('(any-pointer: coarse)').matches) || navigator.maxTouchPoints > 0 || 'ontouchstart' in window;
   if (!TOUCH) return;
 
   const stageEl = document.getElementById('stage'), overlayEl = document.getElementById('overlay');
-  let touchMode = !!(window.matchMedia && matchMedia('(pointer: coarse)').matches);   // auto-aim on; turns off when a real mouse moves (touch laptops)
+  let touchMode = PHONE;   // auto-aim on; turns off when a real mouse moves (touch laptops)
   let shown = false, sneakOn = false;
   const stick = { id: null, x: 0, y: 0 };
 
@@ -43,12 +46,49 @@
   layer.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse') touchMode = true; }, true);
   addEventListener('pointermove', e => { if (e.pointerType === 'mouse') touchMode = false; });
 
+  // ---- phone/tablet only: text that mentions keyboard/mouse, and canvas size that fits the screen ----
+  const wrapEl = document.querySelector('.wrap');
+  let lastHidden = true;
+  function fit() {
+    if (stageEl.hidden) { wrapEl.style.width = ''; wrapEl.style.justifySelf = ''; document.body.classList.remove('tc-play'); return; }
+    document.body.classList.add('tc-play');
+    wrapEl.style.width = '';
+    const top = wrapEl.getBoundingClientRect().top + scrollY;
+    const w = Math.max(240, Math.min(stageEl.clientWidth, (innerHeight - top - 8) * 1.6));   // 16:10, never taller than the visible screen
+    wrapEl.style.width = w + 'px'; wrapEl.style.justifySelf = 'center';
+  }
+  if (PHONE) {
+    const st = document.createElement('style');
+    st.textContent = 'body.tc-play{padding-block:8px}';
+    document.head.appendChild(st);
+    document.querySelector('.note').textContent = 'เล่นด้วยหน้าจอสัมผัส: จอยซ้ายเดิน ปุ่มขวาใช้ท่า เล็งอัตโนมัติไปที่ศัตรูใกล้สุด ผ่านด่านเพื่อปลดล็อกด่านถัดไป';
+    document.querySelector('.controls dl').innerHTML = [
+      ['จอยซ้าย', 'เดิน (เอียงมากเดินเร็ว เอียงน้อยเดินช้า)'],
+      ['ย่อง', 'แตะเพื่อเปิด/ปิดการย่อง (เงียบ มองเห็นยากขึ้น) · เดินปกติมีเสียงฝีเท้า'],
+      ['เล็ง', 'อัตโนมัติ ไปที่ศัตรูใกล้สุดที่มองเห็น'],
+      ['ยิง', 'กดค้างเพื่อยิง (ถ้ามีปืน) หรือแทงมีด'],
+      ['แทง', 'แทงมีด'],
+      ['E', 'หยิบปืนของศัตรู'],
+      ['X', 'ทิ้งปืนที่ถือ'],
+      ['Q', 'สกิล'],
+      ['R', 'อันติ (ชาร์จจากการสังหาร)'],
+      ['❚❚', 'พักเกม'],
+    ].map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('');
+    document.getElementById('pauseBtn').textContent = 'พัก';
+    for (const c of CHARS) c.sk.d = c.sk.d.replace('ไปทางเมาส์', 'ไปทางที่เล็ง').replace('ไปที่เมาส์', 'ไปที่เป้าที่เล็ง');
+    addEventListener('resize', fit); addEventListener('orientationchange', fit);
+  }
+
   const canAct = () => !!G && G.state === 'play' && !G.paused && !stageEl.hidden;
 
   // ---- movement stick -> WASD keys (8 directions) ----
-  const sbase = document.getElementById('tcStick'), knob = document.getElementById('tcKnob'), R = 42, T = .4;
+  const sbase = document.getElementById('tcStick'), knob = document.getElementById('tcKnob'), R = 42, DZ = .12;
+  // analog: dead zone in the middle, full speed from 90% tilt; the game reads window.touchMove (length 0..1)
   function applyStick() {
-    keys.KeyD = stick.x > T; keys.KeyA = stick.x < -T; keys.KeyS = stick.y > T; keys.KeyW = stick.y < -T;
+    const m = Math.hypot(stick.x, stick.y);
+    if (m < DZ) { touchMove.x = touchMove.y = 0; return; }
+    const k = Math.min(1, (m - DZ) / (.9 - DZ)) / m;
+    touchMove.x = stick.x * k; touchMove.y = stick.y * k;
   }
   function stickMove(e) {
     const r = sbase.getBoundingClientRect();
@@ -101,6 +141,7 @@
     stickEnd(); mouse.down = false; fire.classList.remove('on');
   }
   function loop() {
+    if (PHONE && stageEl.hidden !== lastHidden) { lastHidden = stageEl.hidden; fit(); }
     const show = !stageEl.hidden && !!G && overlayEl.hidden;
     if (show !== shown) { shown = show; layer.hidden = !show; if (!show) releaseAll(); }
     if (!G || stageEl.hidden || G.state !== 'play') { if (sneakOn) setSneak(false); }
