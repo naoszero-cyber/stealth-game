@@ -48,19 +48,30 @@
 
   // ---- phone/tablet only: text that mentions keyboard/mouse, and canvas size that fits the screen ----
   const wrapEl = document.querySelector('.wrap');
-  let lastHidden = true;
+  let lastHidden = true, chk = 0;
   function fit() {
     if (stageEl.hidden) { wrapEl.style.width = ''; wrapEl.style.justifySelf = ''; document.body.classList.remove('tc-play'); return; }
     document.body.classList.add('tc-play');
     wrapEl.style.width = '';
     const top = wrapEl.getBoundingClientRect().top + scrollY;
-    const w = Math.max(240, Math.min(stageEl.clientWidth, (innerHeight - top - 8) * 1.6));   // 16:10, never taller than the visible screen
+    const w = Math.max(240, Math.min(stageEl.clientWidth, (viewH() - top - 8) * 1.6));   // 16:10, never taller than the visible screen
     wrapEl.style.width = w + 'px'; wrapEl.style.justifySelf = 'center';
   }
-  if (PHONE) {
+  const viewH = () => Math.min(innerHeight, (window.visualViewport && visualViewport.height) || innerHeight, document.documentElement.clientHeight || 1e9);
+  // the page must never need scrolling while playing: if anything still overflows (late layout, fonts, browser bars), shrink the map until it fits
+  function correct() {
+    const over = document.documentElement.scrollHeight - viewH();
+    if (over > 1) wrapEl.style.width = Math.max(240, wrapEl.getBoundingClientRect().width - over * 1.6) + 'px';
+    else if (scrollY > 0 && over <= 1) scrollTo(0, 0);
+  }
+  {
     const st = document.createElement('style');
     st.textContent = 'body.tc-play{padding-block:8px}';
     document.head.appendChild(st);
+    addEventListener('resize', fit); addEventListener('orientationchange', () => setTimeout(fit, 250));
+    if (window.visualViewport) visualViewport.addEventListener('resize', fit);
+  }
+  if (PHONE) {
     document.querySelector('.note').textContent = 'เล่นด้วยหน้าจอสัมผัส: จอยซ้ายเดิน ปุ่มขวาใช้ท่า เล็งอัตโนมัติไปที่ศัตรูใกล้สุด ผ่านด่านเพื่อปลดล็อกด่านถัดไป';
     document.querySelector('.controls dl').innerHTML = [
       ['จอยซ้าย', 'เดิน (เอียงมากเดินเร็ว เอียงน้อยเดินช้า)'],
@@ -76,7 +87,6 @@
     ].map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('');
     document.getElementById('pauseBtn').textContent = 'พัก';
     for (const c of CHARS) c.sk.d = c.sk.d.replace('ไปทางเมาส์', 'ไปทางที่เล็ง').replace('ไปที่เมาส์', 'ไปที่เป้าที่เล็ง');
-    addEventListener('resize', fit); addEventListener('orientationchange', fit);
   }
 
   const canAct = () => !!G && G.state === 'play' && !G.paused && !stageEl.hidden;
@@ -141,7 +151,8 @@
     stickEnd(); mouse.down = false; fire.classList.remove('on');
   }
   function loop() {
-    if (PHONE && stageEl.hidden !== lastHidden) { lastHidden = stageEl.hidden; fit(); }
+    if (stageEl.hidden !== lastHidden) { lastHidden = stageEl.hidden; fit(); }
+    if (!stageEl.hidden && ++chk % 10 === 0) correct();
     const show = !stageEl.hidden && !!G && overlayEl.hidden;
     if (show !== shown) { shown = show; layer.hidden = !show; if (!show) releaseAll(); }
     if (!G || stageEl.hidden || G.state !== 'play') { if (sneakOn) setSneak(false); }
