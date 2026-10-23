@@ -124,18 +124,6 @@ body.pm .note{font-size:12px}
   padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
 #pmBox{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:16px;width:min(100%,460px);max-height:100%;overflow:auto;display:grid;gap:12px}
 #pmBox button{padding:12px;border-radius:4px;background:transparent;border:1px solid #46515f}
-/* result / pause panel: cover the whole screen instead of the small game frame, and never be taller than the screen */
-body.pm #overlay{position:fixed;z-index:25;padding:max(8px,env(safe-area-inset-top,0px)) max(8px,env(safe-area-inset-right,0px)) max(8px,env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px))}
-body.pm #overlay{grid-template-rows:minmax(0,1fr)}
-#overlay .panel{max-height:100%;overflow:auto}
-@media (orientation:landscape) and (max-height:520px){
-  #overlay .panel{width:min(100%,640px);padding:10px 16px;gap:8px}
-  #overlay .panel h3{font-size:26px}
-  #overlay .rs{min-width:48px;font-size:11px}
-  #overlay .rs b{font-size:17px}
-  #overlay .rs.rank b{font-size:20px}
-  #overlay .ovbtns button{padding:8px 16px}
-}
 @media (orientation:portrait) and (max-height:680px){
   body.pm #cards .card{padding:10px;gap:5px}
   body.pm #cards .card .dot{width:24px;height:24px}
