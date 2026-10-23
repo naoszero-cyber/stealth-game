@@ -22,11 +22,18 @@
 #tc>*{pointer-events:auto;touch-action:none}
 #tc .sbase{position:relative;width:112px;height:112px;border-radius:50%;background:rgba(22,26,32,.55);border:1.5px solid rgba(235,232,227,.35)}
 #tc .sknob{position:absolute;left:50%;top:50%;width:48px;height:48px;margin:-24px 0 0 -24px;border-radius:50%;background:rgba(255,51,71,.75);border:1.5px solid rgba(255,213,218,.8)}
-#tc .pad{display:grid;grid-template-columns:repeat(3,50px);grid-auto-rows:50px;gap:8px}
+#tc .pad{position:relative;width:246px;height:242px;flex:none}
+#tc .pad .b{position:absolute}
+#tc .b.q{left:136px;top:0;width:59px;height:59px;font-size:20px}
+#tc .b.r{left:186px;top:65px;width:59px;height:59px;font-size:20px}
+#tc .b.fire{left:85px;top:113px;width:93px;height:93px;font:700 17px \"Noto Sans Thai\",sans-serif;border-width:2px}
+#tc .b.e{left:0;top:177px;width:52px;height:52px;font-size:18px}
+#tc .b.x{left:6px;top:122px;width:42px;height:42px;font-size:14px}
+#tc .b.sneak{left:176px;top:195px;width:47px;height:47px;font:700 14px \"Noto Sans Thai\",sans-serif}
+@media (max-height:420px){#tc .pad{transform:scale(.85);transform-origin:right bottom}}
 #tc .b{display:grid;place-items:center;border-radius:50%;background:rgba(22,26,32,.6);border:1.5px solid rgba(235,232,227,.4);color:#ebe8e3;
   font:700 14px/1 "IBM Plex Mono",ui-monospace,monospace;padding:0}
 #tc .b.on,#tc .b:active{background:rgba(255,51,71,.7);border-color:#ffd5da}
-#tc .b.fire{grid-column:1/4;border-radius:25px;font:700 15px "Noto Sans Thai",sans-serif}
 #tc .b.pause{width:44px;height:44px;margin-bottom:6px;font-size:16px}
 `;
   document.head.appendChild(css);
@@ -37,9 +44,12 @@
     <div class="sbase" id="tcStick"><div class="sknob" id="tcKnob"></div></div>
     <button class="b pause" id="tcPause" aria-label="พักเกม">❚❚</button>
     <div class="pad">
-      <button class="b" data-a="Q">Q</button><button class="b" data-a="R">R</button><button class="b" data-a="sneak">ย่อง</button>
-      <button class="b" data-a="E">E</button><button class="b" data-a="X">X</button><button class="b" data-a="stab">แทง</button>
-      <button class="b fire" id="tcFire">ยิง</button>
+      <button class="b q" data-a="Q">Q</button>
+      <button class="b r" data-a="R">R</button>
+      <button class="b x" data-a="X">X</button>
+      <button class="b e" data-a="E">E</button>
+      <button class="b sneak" data-a="sneak">ย่อง</button>
+      <button class="b fire" id="tcFire">ยิง/ฟัน</button>
     </div>`;
   document.body.appendChild(layer);
   layer.addEventListener('contextmenu', e => e.preventDefault());
@@ -77,8 +87,7 @@
       ['จอยซ้าย', 'เดิน (เอียงมากเดินเร็ว เอียงน้อยเดินช้า)'],
       ['ย่อง', 'แตะเพื่อเปิด/ปิดการย่อง (เงียบ มองเห็นยากขึ้น) · เดินปกติมีเสียงฝีเท้า'],
       ['เล็ง', 'อัตโนมัติ ไปที่ศัตรูใกล้สุดที่มองเห็น'],
-      ['ยิง', 'กดค้างเพื่อยิง (ถ้ามีปืน) หรือแทงมีด'],
-      ['แทง', 'แทงมีด'],
+      ['ยิง/ฟัน', 'กดค้างเพื่อยิง (ถ้ามีปืน) หรือแทงมีด (ถ้าไม่มีปืน/กระสุนหมด)'],
       ['E', 'หยิบปืนของศัตรู'],
       ['X', 'ทิ้งปืนที่ถือ'],
       ['Q', 'สกิล'],
