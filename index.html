@@ -1,0 +1,157 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Crimson Dot</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=IBM+Plex+Mono:wght@500;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one column. Menu = brand block, character cards, map chips, start. Stage = toolbar + 16:10 canvas with a result overlay. */
+:root {
+  --bg: #0d0f13;
+  --panel: #161a20;
+  --line: #2a313b;
+  --fg: #ebe8e3;
+  --muted: #8d95a1;
+  --red: #ff3347;
+  --steel: #6d8fb3;
+  --teal: #37e6d4;
+  --display: "Big Shoulders Display", "Noto Sans Thai", sans-serif;
+  --body: "Noto Sans Thai", "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg); font: 400 15px/1.55 var(--body);
+  padding-block: 28px 48px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+.shell { width: 100%; max-width: 1040px; margin-inline: auto; }
+#menu { display: grid; gap: 28px; }
+.brand { display: grid; gap: 6px; }
+.eyebrow { margin: 0; font: 500 12px var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+h1 { margin: 0; font: 900 clamp(56px, 12vw, 112px)/.9 var(--display); letter-spacing: .01em; text-transform: uppercase; display: flex; align-items: center; gap: .18em; flex-wrap: wrap; }
+h1 .pip { width: .62em; height: .62em; border-radius: 50%; background: var(--red); box-shadow: 0 0 0 .08em #ffd5da inset, 0 0 40px rgba(255,51,71,.45); }
+.lede { margin: 6px 0 0; max-width: 56ch; color: #c3c8d0; }
+h2 { margin: 0 0 12px; font: 700 13px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 270px), 1fr)); gap: 14px; }
+.card { text-align: left; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 16px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.card:hover { border-color: #46515f; }
+.card.on { border-color: var(--red); box-shadow: 0 0 0 1px var(--red) inset; }
+.dot { width: 34px; height: 34px; border-radius: 50%; background: var(--red); box-shadow: 0 0 0 3px #ffd5da inset; }
+.cname { font: 800 30px/1 var(--display); letter-spacing: .04em; display: flex; align-items: baseline; gap: 10px; }
+.cname small { font: 500 14px var(--body); color: var(--muted); letter-spacing: 0; }
+.stat { display: grid; grid-template-columns: 70px 1fr; align-items: center; gap: 10px; font-size: 12px; color: var(--muted); }
+.stat i { height: 5px; background: #232a33; border-radius: 3px; overflow: hidden; display: block; }
+.stat b { display: block; height: 100%; background: var(--steel); }
+.ab { display: grid; grid-template-columns: 26px 1fr; column-gap: 10px; row-gap: 2px; padding-top: 10px; border-top: 1px solid var(--line); font-size: 13px; color: #c3c8d0; }
+.ab em { grid-row: span 3; font: 700 12px var(--mono); font-style: normal; width: 26px; height: 26px; display: grid; place-items: center; border: 1px solid #46515f; border-radius: 4px; color: var(--fg); }
+.ab.ult em { border-color: var(--red); color: var(--red); }
+.ab strong { color: var(--fg); font-weight: 600; }
+.ab .cd { font: 500 11px var(--mono); color: var(--muted); }
+.maps { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 12px; }
+.map { text-align: left; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; display: grid; gap: 4px; min-width: 0; }
+.map.on { border-color: var(--fg); }
+.map:disabled { opacity: .45; cursor: not-allowed; }
+.map .mn { font: 500 11px var(--mono); letter-spacing: .1em; color: var(--muted); text-transform: uppercase; }
+.map strong { font-size: 17px; font-weight: 600; }
+.tags { display: flex; gap: 6px; flex-wrap: wrap; min-height: 22px; }
+.tags u { text-decoration: none; font: 500 11px var(--mono); padding: 2px 7px; border: 1px solid var(--c); color: var(--c); border-radius: 3px; }
+.startrow { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+#start, .ovbtns button { background: var(--red); color: #fff; border: 0; border-radius: 4px; padding: 13px 28px; font-weight: 700; font-size: 16px; letter-spacing: .02em; }
+#start:hover, .ovbtns button:hover { background: #ff4d5e; }
+.ovbtns button.ghost { background: transparent; border: 1px solid #46515f; color: var(--fg); font-weight: 500; }
+.ovbtns button.ghost:hover { border-color: var(--fg); background: transparent; }
+.note { margin: 0; color: var(--muted); font-size: 13px; max-width: 46ch; }
+.controls dl { margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 8px 24px; }
+.controls div { display: flex; gap: 10px; align-items: baseline; font-size: 14px; color: #c3c8d0; min-width: 0; }
+.controls dt { font: 700 12px var(--mono); color: var(--fg); background: #1d232b; border: 1px solid var(--line); border-radius: 3px; padding: 1px 7px; white-space: nowrap; }
+.controls dd { margin: 0; }
+
+#stage { display: grid; gap: 10px; }
+.bar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.bar button { background: var(--panel); border: 1px solid var(--line); border-radius: 4px; padding: 6px 14px; font-size: 13px; }
+.bar button:hover { border-color: #46515f; }
+.hint { font: 500 11px var(--mono); color: var(--muted); }
+.wrap { position: relative; width: 100%; aspect-ratio: 16 / 10; max-width: 100%; border: 1px solid var(--line); background: #000; }
+canvas { display: block; width: 100%; height: 100%; cursor: crosshair; }
+#overlay { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(8,10,13,.72); padding: 12px; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: clamp(14px, 3vw, 28px); width: min(100%, 460px); display: grid; gap: 14px; text-align: center; }
+.panel h3 { margin: 0; font: 900 clamp(30px, 6vw, 46px)/1 var(--display); text-transform: uppercase; letter-spacing: .03em; }
+.panel h3[data-tone="win"] { color: #9be15d; }
+.panel h3[data-tone="lose"] { color: var(--red); }
+.panel p { margin: 0; color: #c3c8d0; display: flex; gap: 10px 18px; flex-wrap: wrap; justify-content: center; }
+.rs { display: grid; gap: 0; min-width: 60px; font-size: 12px; color: var(--muted); }
+.rs b { font: 700 20px var(--mono); color: var(--fg); }
+.rs.rank b { color: var(--red); font-size: 26px; }
+.ovbtns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.ovbtns button { padding: 10px 20px; font-size: 14px; }
+@media (max-width: 520px) { .note.touch { display: block; } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+
+<div class="shell">
+  <main id="menu">
+    <header class="brand">
+      <p class="eyebrow">ลอบสังหาร · มุมมองด้านบน</p>
+      <h1><span class="pip" aria-hidden="true"></span>Crimson Dot</h1>
+      <p class="lede">คุณคือจุดแดงกลมๆ ที่เข้าไปกำจัดศัตรูในความมืด แทงจากด้านหลังเพื่อฆ่าเงียบ หยิบปืนที่ศัตรูทำตกมาใช้ และระวังบอสที่รออยู่ท้ายด่าน</p>
+    </header>
+    <section aria-labelledby="h-char">
+      <h2 id="h-char">เลือกตัวละคร</h2>
+      <div id="cards" class="cards"></div>
+    </section>
+    <section aria-labelledby="h-map">
+      <h2 id="h-map">เลือกแมพ</h2>
+      <div id="maps" class="maps"></div>
+    </section>
+    <div class="startrow">
+      <button id="start">เริ่มภารกิจ</button>
+      <p class="note">เกมนี้เล่นด้วยคีย์บอร์ดและเมาส์ ผ่านด่านเพื่อปลดล็อกด่านถัดไป</p>
+    </div>
+    <section class="controls" aria-labelledby="h-ctl">
+      <h2 id="h-ctl">ปุ่มควบคุม</h2>
+      <dl>
+        <div><dt>WASD</dt><dd>เดิน</dd></div>
+        <div><dt>Shift</dt><dd>ย่อง (เงียบ มองเห็นยากขึ้น) · เดินปกติมีเสียงฝีเท้า</dd></div>
+        <div><dt>เมาส์</dt><dd>เล็ง</dd></div>
+        <div><dt>คลิกซ้าย</dt><dd>ยิง (ถ้ามีปืน) หรือแทงมีด</dd></div>
+        <div><dt>Space / คลิกขวา</dt><dd>แทงมีด</dd></div>
+        <div><dt>E</dt><dd>หยิบปืนของศัตรู</dd></div>
+        <div><dt>X</dt><dd>ทิ้งปืนที่ถือ</dd></div>
+        <div><dt>Q</dt><dd>สกิล</dd></div>
+        <div><dt>R</dt><dd>อันติ (ชาร์จจากการสังหาร)</dd></div>
+        <div><dt>H</dt><dd>แสดงสถานะ AI ของศัตรู (debug)</dd></div>
+        <div><dt>P / Esc</dt><dd>พักเกม</dd></div>
+      </dl>
+    </section>
+  </main>
+
+  <div id="stage" hidden>
+    <div class="bar">
+      <button id="pauseBtn">พัก (P)</button>
+      <button id="menuBtn">กลับเมนู</button>
+      <span class="hint">แทงจากด้านหลังเพื่อฆ่าเงียบ · เสียงปืนดังไปไกล</span>
+    </div>
+    <div class="wrap">
+      <canvas id="game" aria-label="พื้นที่เล่นเกม"></canvas>
+      <div id="overlay" hidden>
+        <div class="panel">
+          <h3 id="ovT"></h3>
+          <p id="ovS"></p>
+          <div class="ovbtns" id="ovB"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script src="engine.js"></script>
+<script src="logic.js"></script>
+<script src="render.js"></script>
+<script src="touch.js"></script>
+<script src="ui.js"></script>
+
+</body></html>
