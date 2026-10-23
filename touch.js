@@ -22,14 +22,14 @@
 #tc>*{pointer-events:auto;touch-action:none}
 #tc .sbase{position:relative;width:112px;height:112px;border-radius:50%;background:rgba(22,26,32,.55);border:1.5px solid rgba(235,232,227,.35)}
 #tc .sknob{position:absolute;left:50%;top:50%;width:48px;height:48px;margin:-24px 0 0 -24px;border-radius:50%;background:rgba(255,51,71,.75);border:1.5px solid rgba(255,213,218,.8)}
-#tc .pad{position:relative;width:246px;height:242px;flex:none}
+#tc .pad{position:relative;width:232px;height:234px;flex:none}
 #tc .pad .b{position:absolute}
-#tc .b.q{left:136px;top:0;width:59px;height:59px;font-size:20px}
-#tc .b.r{left:186px;top:65px;width:59px;height:59px;font-size:20px}
-#tc .b.fire{left:85px;top:113px;width:93px;height:93px;font:700 17px \"Noto Sans Thai\",sans-serif;border-width:2px}
-#tc .b.e{left:0;top:177px;width:52px;height:52px;font-size:18px}
-#tc .b.x{left:6px;top:122px;width:42px;height:42px;font-size:14px}
-#tc .b.sneak{left:176px;top:195px;width:47px;height:47px;font:700 14px \"Noto Sans Thai\",sans-serif}
+#tc .b.r{left:104px;top:0;width:59px;height:59px;font-size:20px}
+#tc .b.q{left:172px;top:60px;width:59px;height:59px;font-size:20px}
+#tc .b.e{left:0;top:40px;width:52px;height:52px;font-size:18px}
+#tc .b.fire{left:62px;top:92px;width:109px;height:109px;font:700 19px \"Noto Sans Thai\",sans-serif;border-width:2px}
+#tc .b.sneak{left:166px;top:181px;width:53px;height:53px;font:700 15px \"Noto Sans Thai\",sans-serif}
+#tc .b.x{left:0;top:188px;width:46px;height:46px;font-size:15px}
 @media (max-height:420px){#tc .pad{transform:scale(.85);transform-origin:right bottom}}
 #tc .b{display:grid;place-items:center;border-radius:50%;background:rgba(22,26,32,.6);border:1.5px solid rgba(235,232,227,.4);color:#ebe8e3;
   font:700 14px/1 "IBM Plex Mono",ui-monospace,monospace;padding:0}
