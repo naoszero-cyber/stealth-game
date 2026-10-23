@@ -43,6 +43,7 @@ function segPointDist(x1, y1, x2, y2, px, py) {
   return Math.hypot(x1 + dx * t - px, y1 + dy * t - py);
 }
 function pushOut(o, walls) {
+  if (o.r && isFinite(o.x) && isFinite(o.y)) { o.x = clamp(o.x, 20 + o.r, W - 20 - o.r); o.y = clamp(o.y, 20 + o.r, H - 20 - o.r); }   // never leave the arena
   for (const w of walls) {
     const cx = clamp(o.x, w[0], w[0] + w[2]), cy = clamp(o.y, w[1], w[1] + w[3]);
     const dx = o.x - cx, dy = o.y - cy, d = Math.hypot(dx, dy);

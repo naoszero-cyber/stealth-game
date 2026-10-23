@@ -765,7 +765,7 @@ function updEnemy(e, dt) {
 
   // dash in progress (elite skill / boss charge)
   if (e.dash) {
-    e.x += e.dash.vx * dt; e.y += e.dash.vy * dt; pushOut(e, g.walls);
+    for (let i = 0; i < 6; i++) { e.x += e.dash.vx * dt / 6; e.y += e.dash.vy * dt / 6; pushOut(e, g.walls); }   // small sub-steps so a dash can't skip over a thin wall
     e.dash.t -= dt;
     g.fx.push({ x: e.x, y: e.y, vx: 0, vy: 0, t: .25, max: .25, col: e.boss ? e.color : '#37e6d4', r: e.r * .8 });
     if (e.boss && !e.dash.hit && d < e.r + p.r + 4) { e.dash.hit = true; hurtPlayer(26); }
@@ -1011,6 +1011,15 @@ function update(dt) {
     g.stillT = g.p.moving ? 0 : g.stillT + dt;
     if (!g.enemies.some(e => !e.dead && (e.state === 'chase' || e.state === 'search'))) g.alertLvl = Math.max(0, g.alertLvl - dt / 15);
     for (const e of g.enemies) updEnemy(e, e.boss && (clash || e.sandWarn > 0) ? rdt : dt);   // in a clash the boss runs at the player's speed
+    // safety net: a living enemy must always stay inside the arena and out of walls (else it vanishes but still counts as 'left')
+    for (const e of g.enemies) {
+      if (e.dead) continue;
+      if (!isFinite(e.x) || !isFinite(e.y) || e.x < 20 + e.r - 1 || e.x > W - 20 - e.r + 1 || e.y < 20 + e.r - 1 || e.y > H - 20 - e.r + 1 || blocked[cellOf(e.x, e.y)] && g.walls.some(w => e.x > w[0] && e.x < w[0] + w[2] && e.y > w[1] && e.y < w[1] + w[3])) {
+        if (e.lx !== undefined) { e.x = e.lx; e.y = e.ly; } else { e.x = e.path[0][0]; e.y = e.path[0][1]; }
+        e.dash = null;
+        if (!isFinite(e.x) || !isFinite(e.y)) { e.x = e.path[0][0]; e.y = e.path[0][1]; }
+      } else { e.lx = e.x; e.ly = e.y; }
+    }
     // final pass: no two guards may occupy the same spot, whatever moved them
     const L = g.enemies.filter(e => !e.dead);
     for (let i = 0; i < L.length; i++) for (let j = i + 1; j < L.length; j++) {
