@@ -269,7 +269,7 @@ function drawHUD() {
     ctx.fillStyle = boss.color; rr(W / 2 - 177, 63, 354 * Math.max(0, boss.hp / boss.max), 14, 3); ctx.fill();
     ctx.fillStyle = '#0b0d10'; ctx.font = `800 11px ${MONO}`; ctx.fillText(BOSSES[boss.type].name, W / 2, 74);
   }
-  if (g.slowT > 0) {
+  if (g.slowT > 0 && !g.dashSlow) {
     const bw = 220, bx = W / 2 - bw / 2, by = boss ? 86 : 60;
     ctx.fillStyle = 'rgba(10,12,16,.78)'; rr(bx, by, bw, 18, 4); ctx.fill();
     ctx.fillStyle = '#37e6d4'; rr(bx + 3, by + 3, (bw - 6) * (g.slowT / g.slowMax), 12, 3); ctx.fill();

@@ -302,6 +302,7 @@ function fireGun() {
 function startSandevistan(dur, f) {
   const g = G, p = g.p;
   g.slowT = dur; g.slowMax = dur; g.slowF = f;
+  g.dashSlow = false;
   p.haste = f < .1 ? 1.7 : 1.25;
   g.shake = 0;
   g.sandIntro = g.sandMax = .35;     // short activation: white flash -> cyan streak wipe -> time slows
@@ -319,7 +320,7 @@ function useSkill() {
   } else if (ch.id === 'david') {
     p.dash = { vx: c * 1400, vy: s * 1400, t: .14, slash: true, hits: new Set() }; p.inv = .3; p.stabAnim = .18;
     if (g.slowT <= 0) {   // same time-crawl + teal look as his ult, just short (no extra speed boost, no intro freeze)
-      g.slowT = g.slowMax = 1.0; g.slowF = .06; p.haste = 1;
+      g.slowT = g.slowMax = p.dash.t; g.slowF = .06; p.haste = 1; g.dashSlow = true;   // slow only for the length of the dash
       p.lgx = p.x; p.lgy = p.y; p.ghostT = 0;
       g.ghosts = g.ghosts.filter(gh => !gh.sand);
       g.rings.push({ x: p.x, y: p.y, r: 10, max: 110, t: .35 });
@@ -390,6 +391,10 @@ function playerUpdate(dt, real) {
   if (p.dash) {
     for (let i = 0; i < 4; i++) {
       p.x += p.dash.vx * dt / 4; p.y += p.dash.vy * dt / 4; pushOut(p, g.walls);
+      if (p.dash.slash && Math.hypot(p.x - (p.lgx ?? p.x), p.y - (p.lgy ?? p.y)) >= 6) {   // dense teal afterimage chain that lingers after the dash
+        p.lgx = p.x; p.lgy = p.y;
+        g.ghosts.push({ x: p.x, y: p.y, ang: p.ang, t: 1.6, max: 1.6, sand: true, gun: p.gun ? p.gun.type : null });
+      }
       if (p.dash.slash) for (const e of g.enemies) {
         if (e.dead || p.dash.hits.has(e) || Math.hypot(e.x - p.x, e.y - p.y) > e.r + p.r + 14) continue;
         p.dash.hits.add(e);
@@ -431,9 +436,6 @@ function playerUpdate(dt, real) {
       let n = 0; for (const gh of g.ghosts) if (gh.sand) n++;
       if (n > 110) { const i = g.ghosts.findIndex(gh => gh.sand); if (i >= 0) g.ghosts.splice(i, 1); }
     }
-  } else if (p.dash && p.dash.slash) {
-    p.ghostT = (p.ghostT || 0) - dt;
-    if (p.ghostT <= 0) { p.ghostT = .02; g.ghosts.push({ x: p.x, y: p.y, ang: p.ang, t: .45, max: .45 }); }
   }
   if (p.blade > 0) {
     p.blade -= dt;
@@ -990,7 +992,7 @@ function update(dt) {
     return;
   }
   g.rt += rdt;
-  if (g.slowT > 0) { g.slowT -= rdt; if (g.slowT <= 0) { g.slowT = 0; g.slowF = 1; g.p.haste = 1; g.ghosts = g.ghosts.filter(gh => !gh.sand); beep(500, .3, 'sine', .04, -300); } }
+  if (g.slowT > 0) { g.slowT -= rdt; if (g.slowT <= 0) { g.slowT = 0; g.slowF = 1; g.p.haste = 1; g.ghosts = g.ghosts.filter(gh => !gh.sand); g.dashSlow = false;   beep(500, .3, 'sine', .04, -300); } }
   if (g.pslowT > 0) { g.pslowT -= rdt; if (g.pslowT <= 0) { g.pslowT = 0; g.pslowF = 1; beep(520, .3, 'sine', .04, -300); } }
   // both Sandevistans running at once: player and boss share the same (real-time) speed, everything else stays slowed
   const clash = g.slowT > 0 && g.pslowT > 0;
